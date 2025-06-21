@@ -4,7 +4,6 @@ from dotenv import load_dotenv
 from flask import Flask, request, render_template_string
 import markdown
 
-load_dotenv()
 
 CLAVE_API = os.getenv("CLAVE_GEMINI_API")
 
