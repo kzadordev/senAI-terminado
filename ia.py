@@ -5,7 +5,7 @@ from flask import Flask, request, render_template_string
 import markdown
 
 
-CLAVE_API = os.getenv("CLAVE_GEMINI_API")
+CLAVE_API = os.getenv("GEMINI_API_KEY")
 
 if not CLAVE_API:
     raise ValueError("La clave de la API de Gemini no está configurada en el archivo .env")
