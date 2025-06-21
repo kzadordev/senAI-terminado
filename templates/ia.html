@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Chatbot SENA</title>
+  <link rel="stylesheet" href="/static/css/chatbot.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+  <div class="chat-area-standalone">
+    <div class="chat-header">
+      <img src="https://www.sena.edu.co/Style%20Library/alayout/images/logoSena.png?rev=40" alt="Bot Avatar" class="avatar" text="🤖">
+      <div class="chat-title">
+        <h1>Chatbot Reglamento del Aprendiz SENA</h1>
+        <span>En línea</span>
+      </div>
+      <div class="chat-header-icons">
+        <i class="fas fa-search"></i>
+        <i class="fas fa-ellipsis-v"></i>
+      </div>
+    </div>
+    <div id="chat-box" class="chat-messages"></div>
+    <form id="chat-form" class="chat-input-area">
+      <input type="text" id="user-input" placeholder="Escribe tu pregunta..." required>
+      <button type="submit"><i class="fas fa-paper-plane"></i></button>
+    </form>
+  </div>
+
+  <script>
+    const form = document.getElementById('chat-form');
+    const input = document.getElementById('user-input');
+    const chatBox = document.getElementById('chat-box');
+
+    form.onsubmit = async (e) => {
+      e.preventDefault();
+      const pregunta = input.value;
+      if (pregunta.trim() === '') return;
+
+      chatBox.innerHTML += `<div class='message user-msg'><div class="message-content">${pregunta}</div><div class="message-time">${new Date().toLocaleTimeString('es-ES', {hour: '2-digit', minute:'2-digit'})}</div></div>`;
+      input.value = '';
+      chatBox.scrollTop = chatBox.scrollHeight;
+
+      // Simular tiempo de respuesta del bot
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      // Llama a tu API de chatbot
+      const res = await fetch('/pregunta', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pregunta })
+      });
+
+      const data = await res.json();
+      console.log("Datos recibidos del servidor:", data);
+      chatBox.innerHTML += `<div class='message bot-msg'><div class="message-content">${data.respuesta}</div><div class="message-time">${new Date().toLocaleTimeString('es-ES', {hour: '2-digit', minute:'2-digit'})}</div></div>`;
+      chatBox.scrollTop = chatBox.scrollHeight;
+    };
+  </script>
+</body>
+</html>

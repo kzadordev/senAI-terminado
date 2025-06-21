@@ -1,0 +1,92 @@
+body {
+    background: #f4fbfa;
+    font-family: 'Montserrat', Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.menu-up {
+    display: flex;
+    flex-direction: column;
+    background: #44c3a6;
+    height: 100px;
+    padding-top: 15px;
+    color: #fff;
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.menu-up h1 {
+    font-weight: bold;
+    font-size: 2.2rem;
+    margin: 0;
+}
+
+
+
+main {
+    max-width: 700px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 2px 16px rgba(68,195,166,0.08);
+    padding: 32px 24px;
+    text-align: center;
+}
+
+.bienvenido {
+  color: #1a7f6b;
+  font-weight: bold;
+}
+
+main p {
+    font-size: 1.1rem;
+    color: #333;
+    margin-bottom: 24px;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+li {
+    background: #8cebde;
+    border-radius: 12px;
+    margin-bottom: 18px;
+    padding: 18px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 1px 6px rgba(68,195,166,0.07);
+}
+
+li p {
+    margin: 0;
+    font-weight: 500;
+    color: #1a7f6b;
+}
+
+a {
+    color: #fff !important;
+    padding: 8px 18px;
+    border-radius: 8px;
+    text-decoration: none !important; /* <- Aquí el cambio */
+    font-weight: bold;
+    transition: background 0.2s;
+}
+
+a:hover {
+    background: #2ea88c;
+}
+
+footer {
+    text-align: center;
+    color: #ffff;
+    font-size: 0.95rem;
+    margin-top: 40px;
+    padding: 20px 0 10px 0;
+    background: #44c3a6;
+    border-top: 1px solid #d2f5ee;
+}

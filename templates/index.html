@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SenaAI - Asistente Virtual De Instructores</title>
+    <link rel="icon" type="image/svg+xml" href="/static/images/logo-sena-verde-complementario-png-2022.png">
+    <link rel="stylesheet" href="/static/css/index.css">
+    <link rel="stylesheet" href="/static/css/chatbot.css"> <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700,800,900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div id="homePage" class="page">
+        <header class="header">
+            <h1>Gestión Académica y Disciplinaria - SENA</h1>
+            <p>Sistema de apoyo para instructores</p>
+        </header>
+
+        <main class="main">
+            <div class="intro">
+                <h2>¿Qué situación necesitas gestionar?</h2>
+                <p>Selecciona el tipo de situación para recibir una guía paso a paso</p>
+            </div>
+
+            <div class="card-grid">
+    <div class="card">
+        <div class="icon-circle blue"><span>📘</span></div>
+        <h3>Situación Académica</h3>
+        <p>
+            Gestiona situaciones relacionadas con el rendimiento académico, 
+            entregas de evidencias y seguimiento del proceso formativo.
+        </p>
+        <button id="openAcademicoModalButton" class="btn" onclick="abrirModalAcademico()">Ir a Gestión Académica</button>
+    </div>
+
+    <div class="card">
+        <div class="icon-circle red"><span style="font-size:2.2rem;line-height:1;">⚠️</span></div>
+        <h3>Situación Disciplinaria</h3>
+        <p>
+            Maneja situaciones comportamentales y disciplinarias siguiendo 
+            los protocolos establecidos por la institución.
+        </p>
+        <button id="openDisciplinarioModalButton" class="btn" onclick="abrirModalDisciplinario()">Ir a Gestión Disciplinaria</button>
+    </div>
+</div>
+        </main>
+    </div>
+
+    <div class="protocolos-box">
+        <h3>Protocolos y las medidas formativas</h3>
+        <p>Descarga todos los documentos y protocolos necesarios para la gestión académica y disciplinaria</p>
+        <a href="{{ url_for('descargar') }}"> <button class="btn download-btn">
+                <span style="margin-right:8px;">&#128229;</span> Descargar
+            </button>
+        </a>
+    </div>
+
+    <div id="modalDisciplinario" class="modal" style="display:none;">
+        <div class="modal-content">
+            <span class="close-button" onclick="cerrarModalDisciplinario()">&times;</span>
+            <div id="modalTemas">
+                <h3>Selecciona una situación disciplinaria:</h3>
+                <div class="temas-grid">
+                    <div class="tema-opcion">
+                        <span class="tema-icono">📆</span>
+                        <h4>Asistencia</h4>
+                        <button class="tema-btn" onclick="seleccionarTema('inasistencias')">Inasistencias y Retiro Injustificado</button>
+                    </div>
+                    <div class="tema-opcion">
+                        <span class="tema-icono">📝</span>
+                        <h4>Fraude/Plagio</h4>
+                        <button class="tema-btn" onclick="seleccionarTema('fraude_plagio')">Incumplimiento Académico y Fraude</button>
+                    </div>
+                    <div class="tema-opcion">
+                        <span class="tema-icono">🤝</span>
+                        <h4>Convivencia</h4>
+                        <button class="tema-btn" onclick="seleccionarTema('convivencia')">Convivencia y Respeto</button>
+                    </div>
+                    <div class="tema-opcion">
+                        <span class="tema-icono">🏢</span>
+                        <h4>Recursos</h4>
+                        <button class="tema-btn" onclick="seleccionarTema('recursos')">Uso Indebido de Recursos</button>
+                    </div>
+                    <div class="tema-opcion">
+                        <span class="tema-icono">🦺</span>
+                        <h4>Seguridad</h4>
+                        <button class="tema-btn" onclick="seleccionarTema('seguridad')">Normas de Seguridad</button>
+                    </div>
+                    <div class="tema-opcion">
+                        <span class="tema-icono">🏛️</span>
+                        <h4>Imagen</h4>
+                        <button class="tema-btn" onclick="seleccionarTema('imagen')">Imagen Institucional</button>
+                    </div>
+                    <div class="tema-opcion centrar-ultimo">
+                        <span class="tema-icono">📋</span>
+                        <h4>Generales</h4>
+                        <button class="tema-btn" onclick="seleccionarTema('generales')">Deberes Generales</button>
+                    </div>
+                </div>
+            </div>
+            <div id="modalPreguntas" style="display:none;">
+                <p id="modalPregunta"></p>
+                <div class="modal-buttons" id="modalBotones"></div>
+                <button class="btn" style="margin-top:2rem;" onclick="volverTemas()">← Volver a Temas</button>
+            </div>
+            <div class="final-accion" id="finalAccionDisciplinario" style="display:none;">
+                <p id="mensajeFinalDisciplinario"></p>
+                <button class="btn download" onclick="descargarFormatoDisciplinario()">⬇️ Descargar Guia</button>
+                <button class="btn" style="margin-top:1.2rem;" onclick="volverTemas()">Consultar otro caso</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalAcademico" class="modal" style="display:none;">
+        <div class="modal-content">
+            <span class="close-button" onclick="cerrarModalAcademico()">&times;</span>
+            <div id="modalTemasAcademico">
+                <h3>Selecciona una situación académica:</h3>
+                <div class="temas-grid">
+                    <div class="tema-opcion">
+                        <span class="tema-icono">🎯</span>
+                        <h4>Dificultades en Resultados de Aprendizaje</h4>
+                        <button class="tema-btn" onclick="seleccionarTemaAcademico('resultados')">Dificultades en el Logro de Resultados</button>
+                    </div>
+                    <div class="tema-opcion">
+                        <span class="tema-icono">📄</span>
+                        <h4>Evidencias de Aprendizaje</h4>
+                        <button class="tema-btn" onclick="seleccionarTemaAcademico('evidencias')">Incumplimiento en la Entrega de Evidencias</button>
+                    </div>
+                    <div class="tema-opcion">
+                        <span class="tema-icono">🙋‍♂️</span>
+                        <h4>Participación y Compromiso</h4>
+                        <button class="tema-btn" onclick="seleccionarTemaAcademico('participacion')">Baja Participación y Compromiso</button>
+                    </div>
+                    <div class="tema-opcion">
+                        <span class="tema-icono">📝</span>
+                        <h4>Planes de Mejoramiento</h4>
+                        <button class="tema-btn" onclick="seleccionarTemaAcademico('mejoramiento')">Necesidad y Cumplimiento de Planes</button>
+                    </div>
+                    <div class="tema-opcion">
+                        <span class="tema-icono">🧩</span>
+                        <h4>Prerrequisitos y Avance</h4>
+                        <button class="tema-btn" onclick="seleccionarTemaAcademico('prerrequisitos')">Prerrequisitos y Ruta de Aprendizaje</button>
+                    </div>
+                    <div class="tema-opcion">
+                        <span class="tema-icono">💻</span>
+                        <h4>Recursos Tecnológicos</h4>
+                        <button class="tema-btn" onclick="seleccionarTemaAcademico('tecnologia')">Uso de Recursos Tecnológicos</button>
+                    </div>
+                    <div class="tema-opcion centrar-ultimo">
+                        <span class="tema-icono">🤝</span>
+                        <h4>Acuerdos Académicos</h4>
+                        <button class="tema-btn" onclick="seleccionarTemaAcademico('acuerdos')">Incumplimiento de Acuerdos</button>
+                    </div>
+                </div>
+            </div>
+            <div id="modalPreguntasAcademico" style="display:none;">
+                <p id="modalPreguntaAcademico"></p>
+                <div class="modal-buttons" id="modalBotonesAcademico"></div>
+                <button class="btn" style="margin-top:2rem;" onclick="volverTemasAcademico()">← Volver a Temas</button>
+            </div>
+            <div class="final-accion" id="finalAccionAcademico" style="display:none;">
+                <p id="mensajeFinalAcademico"></p>
+                <button class="btn download" onclick="descargarFormatoAcademico()">⬇️ Descargar Guia</button>
+                <button class="btn" style="margin-top:1.2rem;" onclick="volverTemasAcademico()">Consultar otro caso</button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>Sistema desarrollado para facilitar la gestión administrativa de instructores SENA</p>
+        <p>Versión 1.0 - Para uso interno institucional</p>
+    </footer>
+
+    <div class="chatbot-bubble-wrapper">
+        <button id="chatbot-toggle-button" class="chatbot-toggle-button">
+            <i class="fas fa-comment-dots"></i>
+        </button>
+
+        <div id="chatbot-popup" class="chatbot-popup-hidden">
+            <div class="chat-area-standalone">
+                <div class="chat-header">
+                    <img src="https://www.sena.edu.co/Style%20Library/alayout/images/logoSena.png?rev=40" alt="Logo SENA - Bot Avatar" class="avatar">
+                    <div class="chat-title">
+                        <h1>Chatbot Reglamento del Aprendiz SENA</h1>
+                        <span>En línea</span>
+                    </div>
+                    <div class="chat-header-icons">
+                        <i class="fas fa-search"></i>
+                        <i class="fas fa-ellipsis-v"></i>
+                        <i id="close-chatbot-button" class="fas fa-times"></i>
+                    </div>
+                </div>
+                <div id="chat-box" class="chat-messages"></div>
+                <form id="chat-form" class="chat-input-area">
+                    <input type="text" id="user-input" placeholder="Escribe tu pregunta..." required>
+                    <button type="submit"><i class="fas fa-paper-plane"></i></button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+<script type="module">
+    // ====== DATOS Y VARIABLES GLOBALES PARA MODALES ======
+    // Estas variables deben ser globales para que las funciones de los modales
+    // puedan mantener el estado entre las llamadas a los botones.
+    let currentTemaDisciplinarioModal = null;
+    let currentStepDisciplinarioModal = null;
+    let currentTemaAcademicoModal = null;
+    let currentStepAcademicoModal = null;
+    let currentModalState = null; // <-- AGREGA ESTA LÍNEA
+
+    // Datos para el flujo disciplinario
+    const temasDisciplinarios = {
+        'inasistencias': {
+            pregunta: '¿El aprendiz tiene justificación para sus inasistencias?',
+            opciones: {
+                'Si': {
+                    siguiente: 'Ha presentado justificación válida. Documenta la justificación y archívala.'
+                },
+                'No': {
+                    pregunta: '¿Es la primera vez que el aprendiz incurre en inasistencias injustificadas?',
+                    opciones: {
+                        'Si': {
+                            siguiente: 'Debes aplicar un llamado de atención verbal disciplinario y registrarlo en el formato correspondiente. Considera un plan de mejoramiento disciplinario si la situación persiste.'
+                        },
+                        'No': {
+                            siguiente: 'El aprendiz reincide. Debes implementar un plan de mejoramiento disciplinario. Si no cumple, remite al Comité de Evaluación y Seguimiento.'
+                        }
+                    }
+                }
+            },
+            formato: '/static/docs/PROTOCOLO DISCIPLINARIO SENA 2025 rev..docx'
+        },
+        'fraude_plagio': {
+            pregunta: '¿La evidencia de fraude o plagio es clara y contundente?',
+            opciones: {
+                'Si': {
+                    siguiente: 'Debes aplicar un llamado de atención escrito disciplinario. Remite el caso al Comité de Evaluación y Seguimiento para la aplicación de un plan de mejoramiento disciplinario o una sanción según la gravedad.'
+                },
+                'No': {
+                    siguiente: 'Si no hay evidencia clara, busca más pruebas. Si no se puede confirmar, se debe orientar al aprendiz sobre la originalidad y ética académica.'
+                }
+            },
+            formato: '/static/docs/PROTOCOLO DISCIPLINARIO SENA 2025 rev..docx'
+        },
+        'convivencia': {
+            pregunta: '¿La falta de convivencia es leve o grave?',
+            opciones: {
+                'Leve': {
+                    siguiente: 'Realiza un llamado de atención verbal y un plan de mejoramiento disciplinario de convivencia. Registra la situación.'
+                },
+                'Grave': {
+                    siguiente: 'Debes realizar un llamado de atención escrito y remitir inmediatamente al Comité de Evaluación y Seguimiento para acciones más severas.'
+                }
+            },
+            formato: '/static/docs/PROTOCOLO DISCIPLINARIO SENA 2025 rev..docx'
+        },
+        'recursos': {
+            pregunta: '¿El uso indebido de recursos ha causado daño o perjuicio significativo?',
+            opciones: {
+                'Si': {
+                    siguiente: 'Remite al Comité de Evaluación y Seguimiento. Puede implicar sanciones graves y la obligación de reparación del daño.'
+                },
+                'No': {
+                    siguiente: 'Realiza un llamado de atención verbal y sensibiliza al aprendiz sobre el uso adecuado de los recursos institucionales.'
+                }
+            },
+            formato: '/static/docs/PROTOCOLO DISCIPLINARIO SENA 2025 rev..docx'
+        },
+        'seguridad': {
+            pregunta: '¿La violación de las normas de seguridad puso en riesgo la integridad física de alguna persona o infraestructura?',
+            opciones: {
+                'Si': {
+                    siguiente: 'Remite al Comité de Evaluación y Seguimiento de forma inmediata. Se requiere una acción disciplinaria severa.'
+                },
+                'No': {
+                    siguiente: 'Realiza un llamado de atención escrito y refuerza la importancia de las normas de seguridad. Monitorea el cumplimiento.'
+                }
+            },
+            formato: '/static/docs/PROTOCOLO DISCIPLINARIO SENA 2025 rev..docx'
+        },
+        'imagen': {
+            pregunta: '¿La falta contra la imagen institucional fue pública y afectó gravemente la reputación del SENA?',
+            opciones: {
+                'Si': {
+                    siguiente: 'Remite el caso al Comité de Evaluación y Seguimiento. Esto puede acarrear sanciones muy graves.'
+                },
+                'No': {
+                    siguiente: 'Realiza un llamado de atención escrito y un plan de concientización sobre el respeto a la imagen institucional.'
+                }
+            },
+            formato: '/static/docs/PROTOCOLO DISCIPLINARIO SENA 2025 rev..docx'
+        },
+        'generales': {
+            pregunta: '¿El incumplimiento de los deberes generales afecta el desarrollo normal del ambiente de formación?',
+            opciones: {
+                'Si': {
+                    siguiente: 'Evalúa la gravedad. Si es repetitivo o significativo, remite al Comité de Evaluación y Seguimiento. Si es aislado, aplica un llamado de atención escrito y un plan de mejora.'
+                },
+                'No': {
+                    siguiente: 'Realiza un llamado de atención verbal y orienta al aprendiz sobre sus deberes.'
+                }
+            },
+            formato: '/static/docs/PROTOCOLO DISCIPLINARIO SENA 2025 rev..docx'
+        },
+        'comite_evaluacion': {
+            pregunta: '¿El caso debe ser remitido al Comité de Evaluación y Seguimiento?',
+            opciones: {
+                'Si': {
+                    siguiente: 'Prepara el informe detallado del caso y los soportes necesarios para la remisión al Comité. Asegúrate de seguir el debido proceso.'
+                },
+                'No': {
+                    siguiente: 'Continúa aplicando las medidas formativas o disciplinarias de menor nivel según lo establecido en el reglamento. Monitorea la evolución del aprendiz.'
+                }
+            },
+            formato: '/static/docs/PROTOCOLO DISCIPLINARIO SENA 2025 rev..docx'
+        },
+        'medidas_coercitivas': {
+            pregunta: '¿Se requiere aplicar una medida coercitiva o correctiva inmediata debido a la gravedad de la falta?',
+            opciones: {
+                'Si': {
+                    siguiente: 'Aplica la medida coercitiva o correctiva según el protocolo y remite el caso de inmediato al Comité de Evaluación y Seguimiento para su análisis y decisión definitiva.'
+                },
+                'No': {
+                    siguiente: 'Evalúa si la falta puede ser abordada con un llamado de atención (verbal o escrito) o un plan de mejoramiento disciplinario. Procede según el nivel de la falta.'
+                }
+            },
+            formato: '/static/docs/PROTOCOLO DISCIPLINARIO SENA 2025 rev..docx'
+        }
+    };
+
+    // Datos para el flujo académico
+    const temasAcademicos = {
+        'resultados': {
+            pregunta: '¿Se ha realizado una retroalimentación detallada al aprendiz sobre los resultados no logrados?',
+            opciones: {
+                'Si': {
+                    pregunta: '¿El aprendiz ha mostrado compromiso para mejorar después de la retroalimentación?',
+                    opciones: {
+                        'Si': {
+                            siguiente: 'Continúa con el seguimiento. Si es necesario, ofrece apoyos adicionales.'
+                        },
+                        'No': {
+                            siguiente: 'Debes aplicar un Llamado de Atención Académico por escrito. Si persiste, plantea un Plan de Mejoramiento Académico.'
+                        }
+                    }
+                },
+                'No': {
+                    siguiente: 'Realiza una retroalimentación detallada al aprendiz, identificando los resultados de aprendizaje específicos que no ha logrado y las áreas de mejora.'
+                }
+            },
+            formato: '/static/docs/MEDIDAS FORMATIVAS ACADEMICAS.docx'
+        },
+        'evidencias': {
+            pregunta: '¿El aprendiz ha presentado alguna justificación válida para la no entrega de evidencias?',
+            opciones: {
+                'Si': {
+                    siguiente: 'Analiza la validez de la justificación. Si es aceptada, otorga un nuevo plazo. Si no, aplica un Llamado de Atención Académico.'
+                },
+                'No': {
+                    siguiente: 'Aplica un Llamado de Atención Académico por escrito. Si la situación persiste o es recurrente, considera un Plan de Mejoramiento Académico.'
+                }
+            },
+            formato: '/static/docs/MEDIDAS FORMATIVAS ACADEMICAS.docx'
+        },
+        'participacion': {
+            pregunta: '¿La baja participación afecta significativamente el proceso formativo del grupo o el propio aprendizaje del aprendiz?',
+            opciones: {
+                'Si': {
+                    siguiente: 'Realiza un Llamado de Atención Académico y establece acuerdos de participación específicos. Si no hay mejora, considera un Plan de Mejoramiento Académico.'
+                },
+                'No': {
+                    siguiente: 'Habla con el aprendiz para entender las causas de la baja participación y ofrécele estrategias de motivación y apoyo.'
+                }
+            },
+            formato: '/static/docs/MEDIDAS FORMATIVAS ACADEMICAS.docx'
+        },
+        'mejoramiento': {
+            pregunta: '¿El incumplimiento de un Plan de Mejoramiento Académico previamente establecido?',
+            opciones: {
+                'Si': {
+                    siguiente: 'Remite el caso al Comité de Evaluación y Seguimiento. El Comité analizará la situación y determinará las medidas disciplinarias o formativas adicionales.'
+                },
+                'No': {
+                    siguiente: 'Si el plan está en curso, realiza seguimiento y ofrece apoyo. Si aún no se ha establecido, identifica la necesidad y créalo.'
+                }
+            },
+            formato: '/static/docs/MEDIDAS FORMATIVAS ACADEMICAS.docx'
+        },
+        'prerrequisitos': {
+            pregunta: '¿El aprendiz cumple con los prerrequisitos necesarios para avanzar en la ruta de aprendizaje actual?',
+            opciones: {
+                'Si': {
+                    siguiente: 'Revisa si hay otras causas para el retraso. Si no, continua con el proceso normal.'
+                },
+                'No': {
+                    siguiente: 'Orienta al aprendiz sobre la importancia de cumplir los prerrequisitos. Si es necesario, suspende temporalmente el avance hasta que los cumpla o remite a coordinación para reubicación.'
+                }
+            },
+            formato: '/static/docs/MEDIDAS FORMATIVAS ACADEMICAS.docx'
+        },
+        'tecnologia': {
+            pregunta: '¿El uso indebido de recursos tecnológicos ha afectado el desarrollo de las actividades formativas o la seguridad de la información?',
+            opciones: {
+                'Si': {
+                    siguiente: 'Remite al Comité de Evaluación y Seguimiento para acciones disciplinarias. Documenta el incidente.'
+                },
+                'No': {
+                    siguiente: 'Realiza un Llamado de Atención Académico y refuerza las normas de uso de recursos tecnológicos. Sensibiliza sobre la seguridad y el buen uso.'
+                }
+            },
+            formato: '/static/docs/MEDIDAS FORMATIVAS ACADEMICAS.docx'
+        },
+        'acuerdos': {
+            pregunta: '¿El incumplimiento del acuerdo académico es recurrente o afecta el desempeño del grupo?',
+            opciones: {
+                'Si': {
+                    siguiente: 'Aplica un Llamado de Atención Académico por escrito y revisa el acuerdo. Si persiste, considera un Plan de Mejoramiento Académico.'
+                },
+                'No': {
+                    siguiente: 'Dialoga con el aprendiz para entender la causa del incumplimiento y refuerza el compromiso con el acuerdo.'
+                }
+            },
+            formato: '/static/docs/MEDIDAS FORMATIVAS ACADEMICAS.docx'
+        },
+        'plan_mejoramiento_exitoso': {
+            pregunta: '¿El aprendiz ha logrado superar los resultados de aprendizaje no alcanzados después de la implementación de un Plan de Mejoramiento Académico?',
+            opciones: {
+                'Si': {
+                    siguiente: 'Registra el cumplimiento satisfactorio del Plan de Mejoramiento Académico y cierra el caso. Continúa con el seguimiento regular del aprendiz.'
+                },
+                'No': {
+                    siguiente: 'Si el aprendiz no ha logrado superar los resultados de aprendizaje a pesar del Plan de Mejoramiento Académico, remite el caso al Comité de Evaluación y Seguimiento para analizar posibles acciones adicionales, incluyendo la cancelación de la matrícula.'
+                }
+            },
+            formato: '/static/docs/MEDIDAS FORMATIVAS ACADEMICAS.docx'
+        },
+        'evaluacion_desempeno': {
+            pregunta: '¿La situación actual del aprendiz impacta negativamente su evaluación de desempeño en la etapa productiva?',
+            opciones: {
+                'Si': {
+                    siguiente: 'Documenta la situación y su impacto en la evaluación de desempeño. Realiza una reunión con el aprendiz y la empresa, si aplica, para establecer un plan de mejora en la etapa productiva.'
+                },
+                'No': {
+                    siguiente: 'Asegúrate de que la situación no escale a un problema que afecte la evaluación de desempeño. Ofrece acompañamiento y recursos de apoyo para mantener el buen rendimiento.'
+                }
+            },
+            formato: '/static/docs/MEDIDAS FORMATIVAS ACADEMICAS.docx'
+        }
+    };
+
+
+    // ====== FUNCIONES GLOBALES PARA MODALES (Accesibles por onclick) ======
+
+    // Funciones para el Modal Disciplinario
+    window.abrirModalDisciplinario = function() {
+        currentModalState = 'disciplinario';
+        const modalDisciplinario = document.getElementById('modalDisciplinario');
+        const modalTemas = document.getElementById('modalTemas');
+        const modalPreguntas = document.getElementById('modalPreguntas');
+        const finalAccionDisciplinario = document.getElementById('finalAccionDisciplinario');
+
+        if (modalDisciplinario) modalDisciplinario.style.display = 'flex';
+        if (modalTemas) modalTemas.style.display = 'block';
+        if (modalPreguntas) modalPreguntas.style.display = 'none';
+        if (finalAccionDisciplinario) finalAccionDisciplinario.style.display = 'none';
+    };
+
+    window.cerrarModalDisciplinario = function() {
+        const modalDisciplinario = document.getElementById('modalDisciplinario');
+        const modalTemas = document.getElementById('modalTemas');
+        const modalPreguntas = document.getElementById('modalPreguntas');
+        const finalAccionDisciplinario = document.getElementById('finalAccionDisciplinario');
+
+        if (modalDisciplinario) modalDisciplinario.style.display = 'none';
+        currentTemaDisciplinarioModal = null;
+        currentStepDisciplinarioModal = null;
+        currentModalState = null;
+        if (modalTemas) modalTemas.style.display = 'block'; // Reset to themes view
+        if (modalPreguntas) modalPreguntas.style.display = 'none';
+        if (finalAccionDisciplinario) finalAccionDisciplinario.style.display = 'none';
+    };
+
+    window.seleccionarTema = function(temaKey) {
+        currentTemaDisciplinarioModal = temaKey;
+        currentStepDisciplinarioModal = temasDisciplinarios[temaKey];
+        mostrarPreguntaDisciplinario();
+    };
+
+    function mostrarPreguntaDisciplinario() {
+        const modalTemas = document.getElementById('modalTemas');
+        const modalPreguntas = document.getElementById('modalPreguntas');
+        const modalPregunta = document.getElementById('modalPregunta');
+        const botonesDiv = document.getElementById('modalBotones');
+
+        if (modalTemas) modalTemas.style.display = 'none';
+        if (modalPreguntas) modalPreguntas.style.display = 'block';
+        if (modalPregunta && currentStepDisciplinarioModal) modalPregunta.innerText = currentStepDisciplinarioModal.pregunta;
+
+        if (botonesDiv) {
+            botonesDiv.innerHTML = '';
+            if (currentStepDisciplinarioModal && currentStepDisciplinarioModal.opciones) {
+                for (const opcion in currentStepDisciplinarioModal.opciones) {
+                    const button = document.createElement('button');
+                    button.className = 'btn';
+                    button.innerText = opcion;
+                    button.onclick = () => window.responderPreguntaDisciplinario(opcion);
+                    botonesDiv.appendChild(button);
+                }
+            }
+        }
+    }
+
+    window.responderPreguntaDisciplinario = function(respuesta) {
+        if (!currentStepDisciplinarioModal || !currentStepDisciplinarioModal.opciones || !currentStepDisciplinarioModal.opciones[respuesta]) {
+            console.error("Error: Paso o respuesta disciplinaria no válida.");
+            return;
+        }
+
+        const nextPath = currentStepDisciplinarioModal.opciones[respuesta];
+        const modalPreguntas = document.getElementById('modalPreguntas');
+        const finalAccionDisciplinario = document.getElementById('finalAccionDisciplinario');
+        const mensajeFinalDisciplinario = document.getElementById('mensajeFinalDisciplinario');
+
+        if (nextPath.pregunta) {
+            currentStepDisciplinarioModal = nextPath;
+            mostrarPreguntaDisciplinario();
+        } else {
+            if (modalPreguntas) modalPreguntas.style.display = 'none';
+            if (finalAccionDisciplinario) finalAccionDisciplinario.style.display = 'block';
+            if (mensajeFinalDisciplinario) {
+                mensajeFinalDisciplinario.innerHTML = nextPath.siguiente;
+            }
+        }
+    };
+
+    window.volverTemas = function() {
+        const modalPreguntas = document.getElementById('modalPreguntas');
+        const finalAccionDisciplinario = document.getElementById('finalAccionDisciplinario');
+        const modalTemas = document.getElementById('modalTemas');
+
+        if (modalPreguntas) modalPreguntas.style.display = 'none';
+        if (finalAccionDisciplinario) finalAccionDisciplinario.style.display = 'none';
+        if (modalTemas) modalTemas.style.display = 'block';
+        currentTemaDisciplinarioModal = null;
+        currentStepDisciplinarioModal = null;
+    };
+
+    window.descargarFormatoDisciplinario = function() {
+        if (currentTemaDisciplinarioModal && temasDisciplinarios[currentTemaDisciplinarioModal] && temasDisciplinarios[currentTemaDisciplinarioModal].formato) {
+            window.open(temasDisciplinarios[currentTemaDisciplinarioModal].formato, '_blank');
+        } else {
+            alert('No hay un formato específico asociado a este tema o paso.');
+        }
+    };
+
+    // Funciones para el Modal Académico
+    window.abrirModalAcademico = function() {
+        currentModalState = 'academico';
+        const modalAcademico = document.getElementById('modalAcademico');
+        const modalTemasAcademico = document.getElementById('modalTemasAcademico');
+        const modalPreguntasAcademico = document.getElementById('modalPreguntasAcademico');
+        const finalAccionAcademico = document.getElementById('finalAccionAcademico');
+
+        if (modalAcademico) modalAcademico.style.display = 'flex';
+        if (modalTemasAcademico) modalTemasAcademico.style.display = 'block';
+        if (modalPreguntasAcademico) modalPreguntasAcademico.style.display = 'none';
+        if (finalAccionAcademico) finalAccionAcademico.style.display = 'none';
+    };
+
+    window.cerrarModalAcademico = function() {
+        const modalAcademico = document.getElementById('modalAcademico');
+        const modalTemasAcademico = document.getElementById('modalTemasAcademico');
+        const modalPreguntasAcademico = document.getElementById('modalPreguntasAcademico');
+        const finalAccionAcademico = document.getElementById('finalAccionAcademico');
+
+        if (modalAcademico) modalAcademico.style.display = 'none';
+        currentTemaAcademicoModal = null;
+        currentStepAcademicoModal = null;
+        currentModalState = null;
+        if (modalTemasAcademico) modalTemasAcademico.style.display = 'block';
+        if (modalPreguntasAcademico) modalPreguntasAcademico.style.display = 'none';
+        if (finalAccionAcademico) finalAccionAcademico.style.display = 'none';
+    };
+
+    window.seleccionarTemaAcademico = function(temaKey) {
+        currentTemaAcademicoModal = temaKey;
+        currentStepAcademicoModal = temasAcademicos[temaKey];
+        mostrarPreguntaAcademico();
+    };
+
+    function mostrarPreguntaAcademico() {
+        const modalTemasAcademico = document.getElementById('modalTemasAcademico');
+        const modalPreguntasAcademico = document.getElementById('modalPreguntasAcademico');
+        const modalPreguntaAcademico = document.getElementById('modalPreguntaAcademico');
+        const botonesDiv = document.getElementById('modalBotonesAcademico');
+
+        if (modalTemasAcademico) modalTemasAcademico.style.display = 'none';
+        if (modalPreguntasAcademico) modalPreguntasAcademico.style.display = 'block';
+        if (modalPreguntaAcademico && currentStepAcademicoModal) modalPreguntaAcademico.innerText = currentStepAcademicoModal.pregunta;
+
+        if (botonesDiv) {
+            botonesDiv.innerHTML = '';
+            if (currentStepAcademicoModal && currentStepAcademicoModal.opciones) {
+                for (const opcion in currentStepAcademicoModal.opciones) {
+                    const button = document.createElement('button');
+                    button.className = 'btn';
+                    button.innerText = opcion;
+                    button.onclick = () => window.responderPreguntaAcademico(opcion); // Asegúrate de llamar globalmente
+                    botonesDiv.appendChild(button);
+                }
+            }
+        }
+    }
+
+    window.responderPreguntaAcademico = function(respuesta) {
+        if (!currentStepAcademicoModal || !currentStepAcademicoModal.opciones || !currentStepAcademicoModal.opciones[respuesta]) {
+            console.error("Error: Paso o respuesta académica no válida.");
+            return;
+        }
+
+        const nextPath = currentStepAcademicoModal.opciones[respuesta];
+        const modalPreguntasAcademico = document.getElementById('modalPreguntasAcademico');
+        const finalAccionAcademico = document.getElementById('finalAccionAcademico');
+        const mensajeFinalAcademico = document.getElementById('mensajeFinalAcademico');
+
+        if (nextPath.pregunta) {
+            currentStepAcademicoModal = nextPath;
+            mostrarPreguntaAcademico();
+        } else {
+            if (modalPreguntasAcademico) modalPreguntasAcademico.style.display = 'none';
+            if (finalAccionAcademico) finalAccionAcademico.style.display = 'block';
+
+            if (mensajeFinalAcademico) {
+                mensajeFinalAcademico.innerHTML = nextPath.siguiente;
+            }
+        }
+    };
+
+    window.volverTemasAcademico = function() {
+        const modalPreguntasAcademico = document.getElementById('modalPreguntasAcademico');
+        const finalAccionAcademico = document.getElementById('finalAccionAcademico');
+        const modalTemasAcademico = document.getElementById('modalTemasAcademico');
+
+        if (modalPreguntasAcademico) modalPreguntasAcademico.style.display = 'none';
+        if (finalAccionAcademico) finalAccionAcademico.style.display = 'none';
+        if (modalTemasAcademico) modalTemasAcademico.style.display = 'block';
+        currentTemaAcademicoModal = null;
+        currentStepAcademicoModal = null;
+    };
+
+    window.descargarFormatoAcademico = function() {
+        if (currentTemaAcademicoModal && temasAcademicos[currentTemaAcademicoModal] && temasAcademicos[currentTemaAcademicoModal].formato) {
+            window.open(temasAcademicos[currentTemaAcademicoModal].formato, '_blank');
+        } else {
+            alert('No hay un formato específico asociado a este tema o paso.');
+        }
+    };
+
+    // ====== Inicialización de Event Listeners del Chatbot y Click fuera de modales ======
+    document.addEventListener('DOMContentLoaded', () => {
+        const toggleButton = document.getElementById('chatbot-toggle-button');
+        const chatbotPopup = document.getElementById('chatbot-popup');
+        const closeButton = document.getElementById('close-chatbot-button');
+        const chatForm = document.getElementById('chat-form');
+        const chatInput = document.getElementById('user-input');
+        const chatBox = document.getElementById('chat-box');
+
+        if (toggleButton) {
+            toggleButton.addEventListener('click', () => {
+                if (chatbotPopup) {
+                    chatbotPopup.classList.remove('chatbot-popup-hidden');
+                    chatbotPopup.classList.add('chatbot-popup-visible');
+                }
+            });
+        }
+
+        if (closeButton) {
+            closeButton.addEventListener('click', () => {
+                if (chatbotPopup) {
+                    chatbotPopup.classList.remove('chatbot-popup-visible');
+                    chatbotPopup.classList.add('chatbot-popup-hidden');
+                }
+            });
+        }
+
+        if (chatForm) {
+            chatForm.onsubmit = async (e) => {
+                e.preventDefault();
+                const pregunta = chatInput.value;
+                if (pregunta.trim() === '') return;
+
+                if (chatBox) {
+                    chatBox.innerHTML += `<div class='message user-msg'><div class="message-content">${pregunta}</div><div class="message-time">${new Date().toLocaleTimeString('es-ES', {hour: '2-digit', minute:'2-digit'})}</div></div>`;
+                    chatInput.value = '';
+                    chatBox.scrollTop = chatBox.scrollHeight;
+                }
+
+                await new Promise(resolve => setTimeout(resolve, 500));
+
+                try {
+                    const res = await fetch('/pregunta', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ pregunta })
+                    });
+
+                    const data = await res.json();
+                    console.log("Datos recibidos del servidor:", data);
+
+                    if (chatBox) {
+                        chatBox.innerHTML += `<div class='message bot-msg'><div class="message-content">${data.respuesta}</div><div class="message-time">${new Date().toLocaleTimeString('es-ES', {hour: '2-digit', minute:'2-digit'})}</div></div>`;
+                        chatBox.scrollTop = chatBox.scrollHeight;
+                    }
+                } catch (error) {
+                    console.error("Error al comunicarse con el backend:", error);
+                    if (chatBox) {
+                        chatBox.innerHTML += `<div class='message bot-msg'><div class="message-content">Lo siento, no pude conectar con el servidor. Inténtalo de nuevo más tarde.</div><div class="message-time">${new Date().toLocaleTimeString('es-ES', {hour: '2-digit', minute:'2-digit'})}</div></div>`;
+                        chatBox.scrollTop = chatBox.scrollHeight;
+                    }
+                }
+            };
+        }
+
+        // Listener para cerrar modales al hacer clic fuera
+        document.addEventListener('click', function(event) {
+            const modalDisciplinario = document.getElementById('modalDisciplinario');
+            if (modalDisciplinario && modalDisciplinario.style.display === 'flex') {
+                const modalContent = modalDisciplinario.querySelector('.modal-content');
+                if (modalContent && !modalContent.contains(event.target) && event.target !== document.getElementById('openDisciplinarioModalButton')) { // Excluir el botón que abre
+                     window.cerrarModalDisciplinario();
+                }
+            }
+
+            const modalAcademico = document.getElementById('modalAcademico');
+            if (modalAcademico && modalAcademico.style.display === 'flex') {
+                const modalContent = modalAcademico.querySelector('.modal-content');
+                if (modalContent && !modalContent.contains(event.target) && event.target !== document.getElementById('openAcademicoModalButton')) { // Excluir el botón que abre
+                     window.cerrarModalAcademico();
+                }
+            }
+        });
+    });
+</script>
+</body>
+</html>
